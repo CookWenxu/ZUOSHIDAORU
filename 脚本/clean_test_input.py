@@ -52,11 +52,14 @@ def extract_counterparties(text):
     例如：
     - "1）9.82Y 260005 1.75 1.1E 05.06+0 平安证券 出给 山东高青农商行"
     提取：["平安证券", "山东高青农商行"]
+    - "3. 260007 1.588  2000 +0 建湖农商 请求 出给 淳化农信 请求"
+    提取：["建湖农商", "淳化农信"]
     """
     parties = []
     
-    # 模式 1：提取"出给"之前的对手方
-    match = re.search(r'[\d)）Y\s]+[\d\.]+[\s]+[\d\.]+[\s]+[\d\.E\s]+[\d\.\+]+\s+(.+?)\s+出给', text)
+    # 模式 1：提取"出给"之前的对手方（支持中间有"请求"等标签）
+    # 格式：序号 债券代码 收益率 金额 +0 对手方 [请求] 出给
+    match = re.search(r'[\d)）Y\s]+[\d\.]+[\s]+[\d\.]+[\s]+[\d\.E\s]+[\d\.\+]+\s+(.+?)\s+(?:请求\s+)?出给', text)
     if match:
         before_section = match.group(1)
         # 分割多个对手方（按 + 号）
@@ -67,14 +70,17 @@ def extract_counterparties(text):
             if party_match:
                 parties.append(party_match.group(1))
     
-    # 模式 2：提取"出给"之后的对手方
-    match = re.search(r'出给\s+(.+?)(?:,|$)', text)
+    # 模式 2：提取"出给"之后的对手方（支持后面有"请求"等标签，以及多个对手方用+连接）
+    # 格式：出给 对手方1 [数量] [请求]+对手方2 [数量] ...
+    match = re.search(r'出给\s+(.+?)(?:$)', text)
     if match:
         after_section = match.group(1)
-        # 分割多个对手方
+        # 分割多个对手方（按 + 号）
         parts = re.split(r'\+', after_section)
         for part in parts:
-            party_match = re.search(r'([\u4e00-\u9fa5A-Za-z]+)', part.strip())
+            # 去除请求、对话等标签，提取纯名称部分
+            clean_part = re.sub(r'\s*(?:请求|对话|发请求)\s*$', '', part.strip())
+            party_match = re.search(r'([\u4e00-\u9fa5A-Za-z]+)', clean_part)
             if party_match:
                 parties.append(party_match.group(1))
     

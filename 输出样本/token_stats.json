@@ -1,9 +1,9 @@
 {
-  "total_tokens": 31386,
-  "prompt_tokens": 28824,
-  "completion_tokens": 2562,
-  "input_cost": 0.014412000000000001,
-  "output_cost": 0.002562,
-  "total_cost": 0.016974000000000003,
-  "request_count": 16
+  "total_tokens": 60837,
+  "prompt_tokens": 55756,
+  "completion_tokens": 5081,
+  "input_cost": 0.027878,
+  "output_cost": 0.0050810000000000004,
+  "total_cost": 0.032959,
+  "request_count": 31
 }
