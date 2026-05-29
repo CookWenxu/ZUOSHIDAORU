@@ -14,7 +14,10 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # ===================== 配置区域 =====================
-API_KEY = "sk-42f8ac0d46784358aea06abb926f3960"  # 直接设置 API Key
+# 从环境变量读取 API Key（不要硬编码！）
+API_KEY = os.getenv("DEEPSEEK_API_KEY")
+if not API_KEY:
+    raise ValueError("请设置环境变量 DEEPSEEK_API_KEY")
 
 MODEL = "deepseek-chat"  # DeepSeek-V4-Flash
 OUTPUT_FILE = "输出样本/测试结果_deepseek_v4.txt"
